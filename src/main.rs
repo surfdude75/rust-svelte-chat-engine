@@ -1,9 +1,6 @@
 use std::{convert::Infallible, sync::Arc};
 
-use chat_engine::{
-    api::{self, chat::ChatManager, websocket::websocket_filter},
-    token_manager::TokenManager,
-};
+use chat_engine::api::{chat::ChatManager, websocket::websocket_filter};
 use rust_embed::RustEmbed;
 use tokio::spawn;
 use warp::{
@@ -30,25 +27,16 @@ async fn handle_rejection(error: Rejection) -> Result<impl Reply, Infallible> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<(dyn std::error::Error + 'static)>> {
-    let token_manager = Arc::new(TokenManager::new(4, None, None));
     let websocket_manager = Arc::new(ChatManager::default());
 
     let websocket_api = websocket_filter(Arc::clone(&websocket_manager));
-
-    let token_api_create = api::token::create(Arc::clone(&token_manager));
-    let token_api_list = api::token::list(Arc::clone(&token_manager));
-    let token_api_connect = api::token::connect(Arc::clone(&token_manager));
 
     let static_content = warp::any()
         .and(warp::get())
         .and(warp_embed::embed(&Static))
         .boxed();
 
-    let routes = token_api_create
-        .or(token_api_list)
-        .or(token_api_connect)
-        .or(websocket_api)
-        .or(static_content);
+    let routes = websocket_api.or(static_content);
 
     let routes = routes.recover(handle_rejection);
     let routes = routes.with(warp::cors());
