@@ -40,6 +40,7 @@ impl ChatManager {
             for client in clients {
                 client.join_room(room.get_id()).await;
             }
+            creator.join_room(room.get_id()).await;
             return Some(room);
         }
         None
