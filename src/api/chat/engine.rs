@@ -79,8 +79,9 @@ impl ChatEngine {
                 "creator_id": room.get_creator().to_string()
             }
         });
+        //TODO: Avoid lof error if no one is listening
         self.sender.lock().await.send(message).unwrap_or_else(|e| {
-            println!("{} engine room broadcast error {}", room.get_id(), e);
+            println!("{} engine room add broadcast error {}", room.get_id(), e);
             0
         });
     }
@@ -97,7 +98,7 @@ impl ChatEngine {
             }
         });
         self.sender.lock().await.send(message).unwrap_or_else(|e| {
-            println!("{} engine room broadcast error {}", room_id, e);
+            println!("{} engine room remove broadcast error {}", room_id, e);
             0
         });
     }

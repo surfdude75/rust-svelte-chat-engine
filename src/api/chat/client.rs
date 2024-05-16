@@ -119,7 +119,7 @@ impl WebSocketClient {
                             println!("{} room to client task exit", client_id);
                         });
                     }
-                    print!("DEBUG {} client joined room {}", client_id, room_id);
+                    println!("DEBUG {} client joined room {}", client_id, room_id);
                     room.exec(
                         &json!({
                             "action": "BROADCAST",

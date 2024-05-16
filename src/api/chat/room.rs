@@ -22,7 +22,7 @@ pub struct WebSocketRoom {
 
 impl WebSocketRoom {
     fn new(engine: &Arc<ChatEngine>, creator: &Uuid) -> Self {
-        let (sender, _) = broadcast::channel(1);
+        let (sender, _) = broadcast::channel(10); //TODO: Should be 1? Handle Lagged in client loop
         let engine = Arc::downgrade(engine);
         Self {
             id: Uuid::new_v4(),
@@ -79,7 +79,7 @@ impl WebSocketRoom {
             }
         });
         self.sender.lock().await.send(value).unwrap_or_else(|e| {
-            println!("{} room broadcast error {}", self.get_id(), e);
+            println!("{} room remove client broadcast error {}", self.get_id(), e);
             0
         });
     }
@@ -91,7 +91,7 @@ impl WebSocketRoom {
             }
             value["room"] = json!(self.get_id().to_string());
             self.sender.lock().await.send(value).unwrap_or_else(|e| {
-                println!("{} room broadcast error {}", self.get_id(), e);
+                println!("{} room exec broadcast error {}", self.get_id(), e);
                 0
             });
         } else if value["action"] == "ROOM_EXIT" {

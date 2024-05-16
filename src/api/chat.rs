@@ -37,10 +37,21 @@ impl ChatManager {
 
         if let Some(creator) = clients.pop() {
             let room = WebSocketRoom::create_room(&self.engine, creator.get_id()).await;
+            println!("DEBUG created room {}", room.get_id());
+            creator.join_room(room.get_id()).await;
+            println!(
+                "DEBUG creator client {} joined room {}",
+                creator.get_id(),
+                room.get_id()
+            );
             for client in clients {
                 client.join_room(room.get_id()).await;
+                println!(
+                    "DEBUG client {} joined room {}",
+                    client.get_id(),
+                    room.get_id()
+                );
             }
-            creator.join_room(room.get_id()).await;
             return Some(room);
         }
         None
